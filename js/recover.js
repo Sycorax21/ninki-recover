@@ -1,4 +1,3 @@
-﻿var api_key = '3b8c4b3c313fc6ba0e69792b0154cc88';
 var addr = '';
 
 var addresses = [];
@@ -16,6 +15,7 @@ var outputsToSpend = [];
 var publicKeys = [];
 var privKeys = [];
 var pathsToSpend = [];
+const sleep = 5500;
 
 $(document).ready(function () {
 
@@ -136,8 +136,8 @@ $(document).ready(function () {
             for (var k = 0; k < obj.length; k++) {
 
                 //if (obj[k].value > 0) {
-                var h = obj[k].transaction_hash;
-                var outind = obj[k].output_index;
+                var h = obj[k].txid;
+                var outind = obj[k].output_no;
 
                 var addr = addressesWithUnspent[i]
 
@@ -171,7 +171,7 @@ $(document).ready(function () {
 
         var amountsToSend = [];
         balance = balance * 1.0;
-        balance = balance - 10000;
+        balance = balance - 50000;
         amountsToSend.push(balance);
 
         var addressToSend = [];
@@ -179,22 +179,22 @@ $(document).ready(function () {
 
         var tx = GetTransactionData(outputsToSpend, pathsToSpend, publicKeys, amountsToSend, addressToSend, privKeys);
 
-
-        var url = 'https://api.chain.com/v1/bitcoin/transactions?api-key-id=' + api_key;
+		console.log("Sending POST with tx: " + tx);
+        var url = 'https://sochain.com/api/v2/send_tx/BTC';
         $.ajax({
             url: url,
             type: 'POST',
             dataType: 'json',
             data: JSON.stringify({
-                hex: tx
+                tx_hex: tx
             }),
             success: function (data) {
-                $("#sendresults").html("Transaction Id: " + data.transaction_hash);
+                $("#sendresults").html("Transaction Id: " + data.data.txid);
                 console.log(data);
             },
             error: function (data) {
                 $("#sendresults").html(data.responseJSON.message);
-                //console.log(data);
+                console.log(data);
             }
         });
 
@@ -222,24 +222,21 @@ $(document).ready(function () {
             $("#progmess").html("Checking " + address + "...");
             $(".balance").html((balance/ 100000000) + " BTC");
 
-
+			console.log("querying: https://sochain.com/api/v2/get_address_balance/BTC/" + address);
             jQuery.ajax({
-                url: "https://api.chain.com/v1/bitcoin/addresses/" + address,
+                url: "https://sochain.com/api/v2/get_address_balance/BTC/" + address,
                 type: 'GET',
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'Basic ' + btoa(api_key));
-                },
                 success: function (data) {
 
                     console.log(data);
 
 
-                    if (data.received > 0) {
+                    if (data.status == 'success') {
 
-                        balance += (data.balance * 1);
-                        cbalance += (data.balance * 1);
+                        balance += (data.data.confirmed_balance * 1);
+                        cbalance += (data.data.confirmed_balance * 1);
                         addresses.push(address);
-                        dustcheck[address] = data.balance;
+                        dustcheck[address] = data.data.confirmed_balance;
 
                         //nodes.push('m/0/0/');
 
@@ -262,15 +259,14 @@ $(document).ready(function () {
 
             nodeCounter++;
 
-            if (nodeCounter <= 50000) {
+            if (nodeCounter <= 20) {
                 scanNode(noderoot, callback);
             } else {
-
                 nodeCounter = 0;
                 knodeCounter = 0;
                 callback();
             }
-        }, 50);
+        }, sleep);
     }
 
 
@@ -296,7 +292,7 @@ $(document).ready(function () {
 
 
     var activeFriendNodes = [];
-    var estNumberOfFriends = 10;
+    var estNumberOfFriends = 1;
     var activeFriendCounter = 1000;
     function scanForActiveFriendNodes(callback) {
 
@@ -307,18 +303,16 @@ $(document).ready(function () {
             var address = getAddress(path, hotPub, coldPub, hninki);
 
             $("#progmess").html("Checking node " + path);
-
+			
+			console.log("querying: https://sochain.com/api/v2/get_address_balance/BTC/" + address);
             jQuery.ajax({
-                url: "https://api.chain.com/v1/bitcoin/addresses/" + address,
+                url: "https://sochain.com/api/v2/get_address_balance/BTC/" + address,
                 type: 'GET',
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'Basic ' + btoa(api_key));
-                },
                 success: function (data) {
 
                     console.log(data);
 
-                    if (data.received > 0) {
+                    if (data.status == 'success') {
 
                         activeFriendNodes.push(path);
                     }
@@ -333,7 +327,7 @@ $(document).ready(function () {
             } else {
                 callback();
             }
-        }, 50);
+        }, sleep);
     }
 
 
@@ -405,13 +399,10 @@ $(document).ready(function () {
 
                         var sadd = "";
                         for (var i = 0; i < addresses.length; i++) {
-
+							
                             jQuery.ajax({
-                                url: "https://api.chain.com/v1/bitcoin/addresses/" + addresses[i] + "/unspents",
+                                url: "https://sochain.com/api/v2/get_tx_unspent/BTC/" + addresses[i] + "/unspents",
                                 type: 'GET',
-                                beforeSend: function (xhr) {
-                                    xhr.setRequestHeader('Authorization', 'Basic ' + btoa(api_key));
-                                },
                                 success: function (data) {
                                     if (data.length > 0) {
                                         console.log(data);
@@ -605,7 +596,7 @@ function GetTransactionData(outputsToSpend, paths, publicKeys, amountsToSend, ad
 
     //get the transaction and return along with the hashes used to sign
     var txn = GetTransaction(publicKeys, outputsToSpend, amountsToSend, addressToSend, signatures);
-
+	
     //generate the signatures
     //TO DO: check call back?
     return Bitcoin2.convert.bytesToHex(txn);
