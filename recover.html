@@ -1,4 +1,5 @@
-?<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title>Ninki</title>
@@ -16,10 +17,8 @@
                 <img src="images/ninki.png" width="200" height="150" />
             </div>
             <div class="alert alert-info">
-                <p class="h4">
-                    Alpha Version</p>
-                <p>
-                    To do:</p>
+                <p class="h4">Alpha Version</p>
+                <p>To do:</p>
                 <ul>
                     <li>Specify transaction fee</li>
                     <li>Estimate number of friends</li>
@@ -37,86 +36,78 @@
                     </ul>
                 </div>
                 <div class="panel-body">
-                    <p>
-                        Complete this wizard to recover your funds</p>
-                    <div class="line line-lg">
-                    </div>
-                    <h4>
-                        Recover your funds</h4>
+                    <p>Complete this wizard to recover your funds</p>
+                    <div class="line line-lg"></div>
+                    <h4>Recover your funds</h4>
                     <div class="progress progress-xs m-t-md">
-                        <div id="prgsecwiz" class="progress-bar bg-info">
-                        </div>
+                        <div id="prgsecwiz" class="progress-bar bg-info"></div>
                     </div>
                     <div class="tab-content">
+                        <!-- Step 1: Offline key phrase -->
                         <div class="tab-pane" id="step1">
                             <div class="text-center">
-                                <p>
-                                    Enter your offline key phrase</p>
+                                <p>Enter your offline key phrase</p>
                                 <div class="list-group-item bg-info">
-                                    <textarea class="form-control" placeholder="Enter your offline key phrase (12 words)" rows="6"
-                                        id="txtCold"></textarea>
+                                    <textarea class="form-control" placeholder="Enter your offline key phrase (12 words)" rows="6" id="txtCold"></textarea>
                                 </div>
                             </div>
                         </div>
+                        <!-- Step 2: Online key phrase -->
                         <div class="tab-pane" id="step2">
                             <div class="text-center">
-                                <p>
-                                    Enter your online key phrase</p>
+                                <p>Enter your online key phrase</p>
                                 <div class="list-group-item bg-warning">
-                                    <textarea class="form-control" placeholder="Enter your online key phrase (12 words)" rows="6"
-                                        id="txtHot"></textarea>
+                                    <textarea class="form-control" placeholder="Enter your online key phrase (12 words)" rows="6" id="txtHot"></textarea>
                                 </div>
                             </div>
                         </div>
+                        <!-- Step 3: Ninki public key -->
                         <div class="tab-pane" id="step3">
                             <div class="text-center">
                                 <p>
                                     Enter your Ninki public key<br />
-                                    (you recieved this in an email when you created your account)
+                                    (you received this in an email when you created your account)
                                 </p>
                                 <div class="list-group-item bg-warning">
-                                    <textarea class="form-control" placeholder="Enter your Ninki public key (xpub....)" rows="6"
-                                        id="txtNinki"></textarea>
+                                    <textarea class="form-control" placeholder="Enter your Ninki public key (xpub....)" rows="6" id="txtNinki"></textarea>
                                 </div>
                             </div>
                         </div>
+                        <!-- Step 4: Sweep Address Space (Offline) -->
                         <div class="tab-pane" id="step4">
                             <div class="list-group-item text-center">
-                                <h4>
-                                    Balance: <span class="balance"></span>
-                                </h4>
-                            </div>
-                            <div class="list-group-item text-center">
-                                <div id="prog" class="progress progress-xs m-t-sm">
-                                    <div id="progstatus" class="progress-bar bg-warning" data-toggle="tooltip" data-original-title="0%"
-                                        style="width: 0%">
-                                    </div>
-                                </div>
-                                <div id="progmess">
-                                </div>
-                                <div id="results">
-                                </div>
+                                <h4>Derived Addresses:</h4>
+                                <div id="results"></div>
+                                <p class="help-block">
+                                    The addresses above have been derived from your seeds. Please check these addresses using your preferred blockchain explorer to determine if any funds are present.
+                                </p>
                             </div>
                             <div class="list-group-item text-center">
                                 <button type="button" class="btn btn-primary btn-block" id="btnSweep">
                                     Sweep Address Space</button>
                             </div>
                         </div>
+                        <!-- Step 5: Claim Funds (Manual UTXO Input) -->
                         <div class="tab-pane" id="step5">
                             <div class="list-group-item text-center">
-                                <h4>
-                                    Balance: <span class="balance"></span>
-                                </h4>
+                                <h4>Derived Balance: <span class="balance"></span></h4>
                             </div>
                             <div class="list-group-item text-center">
-                                <div style="word-wrap: break-word" id="sendresults">
-                                </div>
+                                <div style="word-wrap: break-word" id="sendresults"></div>
                             </div>
                             <div class="list-group-item text-center">
-                                <input id="txtAddress" class="form-control" placeholder="Address to send funds to" /></div>
+                                <input id="txtAddress" class="form-control" placeholder="Destination address to send funds to" />
+                            </div>
+                            <div class="list-group-item text-center">
+                                <textarea id="utxoInput" class="form-control" placeholder="Paste UTXO JSON here" rows="6"></textarea>
+                                <p class="help-block">
+                                    Paste here the JSON-formatted UTXO details (transaction_hash, output_index, address, value) that you gathered externally.
+                                </p>
+                            </div>
                             <div class="list-group-item text-center">
                                 <button type="button" class="btn btn-primary btn-block" id="btnSend">
-                                    Claim Funds</button></div>
+                                    Claim Funds</button>
+                            </div>
                         </div>
                     </div>
                     <ul class="pager wizard m-b-sm">
